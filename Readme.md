@@ -328,11 +328,28 @@ implémenter ces *Design Patterns*.
 </table>
 
 Certains autres DPs sont déjà mis en œuvre par CiT, tels que :
-- <i>Centralized log analysis</>, avec Kibana.
+- <i>Centralized log analysis</i>, avec Kibana.
 - <i>Control loop</i> (<i>Observe, Analyse, Act</i>), avec kubernetes.
 - <i>Centralized monitoring and alarms</i>, avec Grafana
 
-## Spring Boot
+### *Service Meshes* et *API Gateways*
+
+D'une manière générale, un *API Gateway* se trouve sur le périmètre de votre système et traite le trafic nord-sud. 
+Ses principales préoccupations sont la gestion de l'accès du monde extérieur à vos microservices internes. 
+Un *service meshe*, en revanche, traite la communication entre les microservices à l'intérieur 
+de votre périmètre (le trafic est-ouest), comme le montre la figure ci-dessous.
+
+![img.png](z_md/service_mesh.png)
+
+Les *services mesh* et les *API Gateway* peuvent potentiellement permettre aux microservices de partager 
+du code sans nécessiter la création de nouvelles bibliothèques clientes ou de nouveaux microservices. 
+En termes (très) simples, ils peuvent fonctionner comme des proxys entre les microservices. 
+
+Si on utilise un *service mesh* ou *API Gateway* pour implémenter un comportement partagé et 
+commun pour vos microservices, il est essentiel que ce comportement soit totalement générique, c'est-à-dire que 
+le comportement dans le proxy n'ait aucun rapport avec un comportement spécifique d'un microservice.
+
+### Spring Boot et containers
 
 On propose développer des microservices contenant une logique métier basée sur des Spring Beans simples et exposer 
 des API REST à l'aide de Spring WebFlux. Les API seront documentées sur la base de la spécification OpenAPI à l'aide 
@@ -344,6 +361,15 @@ réactifs, y compris des API REST synchrones non bloquantes. Pour développer de
 messages, nous utiliserons Spring Cloud Stream.
 
 Et pour la conteneurisation, nous continuerons avec les solutions Docker et Kubernetes.
+
+### Multi-project
+
+Pour ce POC nous utiliserons l'approche multi-project juste pour faciliter le démarrage de tous les microservices à 
+partir de zéro.
+
+D'un point de vue DevOps, une configuration multi-projets n'est pas à privilégier. Au lieu de cela, 
+pour permettre à chaque microservice d'avoir son propre cycle de construction et de publication, il serait 
+préférable de configurer un pipeline de construction distinct pour chaque projet de microservice.
 
 ## Références
 
