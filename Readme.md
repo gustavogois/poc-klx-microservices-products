@@ -373,7 +373,8 @@ préférable de configurer un pipeline de construction distinct pour chaque proj
 
 ## Références
 
-1. Building Microservices - Second edition. Sam Newman. O'Reilly Media, Inc., 2021.
-2. Microservices with Spring Boot and Spring Cloud - Second Edition. Magnus Larsson. Packt Publishing, 2021.
-3. The Reactive manifesto. https://www.reactivemanifesto.org/ 
-4. Good design principles for microservices, the 12-factor app. https://12factor.net 
+- Building Microservices - Second edition. Sam Newman. O'Reilly Media, Inc., 2021. 
+- Microservices with Spring Boot and Spring Cloud - Second Edition. Magnus Larsson. Packt Publishing, 2021.
+- Spring framework documentation. https://spring.io/ 
+- The Reactive manifesto. https://www.reactivemanifesto.org/
+- Good design principles for microservices, the 12-factor app. https://12factor.net 
