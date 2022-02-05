@@ -97,6 +97,45 @@ Example:
 As we can see from the preceding output, the hostname is equivalent to the ID of the container, 
 which is good to know if you want to understand which container actually responded to your request.
 
+### Docker compose
+
+We configured the application.yml file for product-composite-service for the product-composite-service
+since it needs to know where to find the core services. 
+When we ran all the services on localhost, it was configured to use localhost and individual port 
+numbers, 7001-7003, for each core service. When running in Docker, each service will have its 
+own hostname but will be accessible on the same port number, 8080
+
+See that the hostnames ```product```, ```recommendation``` and ```review``` used in this ```application.yml``` 
+file from the 
+```docker-compose.yml``` file.
+
+For the product-composite service, we will also specify port 
+mappings – we will expose its port so it can be reached from outside 
+Docker. The other microservices will not be accessible from the outside.
+
+#### Running with Docker Compose
+
+```
+mvn clean install
+docker-compose build
+docker-compose up -d
+```
+
+We can follow the startup by monitoring the output that's written to each container log with the following command
+```
+docker-compose logs -f
+```
+
+Try :
+```
+curl localhost:8080/product-composite/123 -s | jq .
+```
+
+Stopping:
+```
+docker-compose down
+```
+
 ## Docker tips
 
 ```
