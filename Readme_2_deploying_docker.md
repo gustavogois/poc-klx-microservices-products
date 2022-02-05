@@ -136,6 +136,12 @@ Stopping:
 docker-compose down
 ```
 
+#### Testing with the script
+
+```
+./z_test-em-all.bash start stop
+```
+
 ## Docker tips
 
 ```
