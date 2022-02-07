@@ -338,3 +338,143 @@ We also need to set up the configuration for the messaging system, to be able to
 Testing asynchronous event-driven microservices is, by its nature, difficult. Tests typically need to synchronize on the asynchronous background processing in some way to be able to verify the result. Spring Cloud Stream comes with support, in the form of a test binder, that can be used to verify what messages have been sent without using any messaging system during the tests.
 
 The test support includes an ```OutputDestination``` helper class that can be used to get the messages that were sent during a test. A new test class, ```MessagingTests```, has been added to run tests that verify that the expected messages are sent.
+
+## Running manual tests
+
+We will use RabbitMQ as the message broker. Since RabbitMQ can be used both with and without partitions, we will test both cases. 
+Two different configurations will be used in the Docker Compose file:
+- Using RabbitMQ without the use of partitions
+- Using RabbitMQ with two partitions per topic
+
+However, before testing these two configurations, we need to add two features to be able to test the asynchronous processing:
+- Saving events for later inspection when using RabbitMQ
+- A health API that can be used to monitor the state of the microservice landscape
+
+### Saving events
+
+After running some tests on event-driven asynchronous services, it might be of interest to see what events were actually sent. 
+When using Spring Cloud Stream with RabbitMQ, the events are removed after they have been processed successfully.
+
+To be able to see what events have been published on each topic, Spring Cloud Stream is configured to save published events in a separate consumer group, auditGroup, per topic.
+When using RabbitMQ, this will result in extra queues being created where the events are stored for later inspection.
+
+### Adding a health API
+
+Testing a system landscape of microservices that uses a combination of synchronous APIs and asynchronous messaging is challenging. For example, how do we know when a newly started landscape of microservices, together with their databases and messaging system, are ready to process requests and messages?
+
+To make it easier to know when all the microservices are ready, we have added health APIs to the microservices. The health APIs are based on the support for health endpoints that comes with the Spring Boot module Actuator. By default, an Actuator-based health endpoint answers UP (and gives 200 as the HTTP return status) if the microservice itself and all the dependencies Spring Boot knows about are available. Dependencies Spring Boot knows about include, for example, databases and messaging systems. If the microservice itself or any of its dependencies are not available, the health endpoint answers DOWN (and returns 500 as the HTTP return status).
+
+We can also extend health endpoints to cover dependencies that Spring Boot is not aware of. We will use this feature to extend to the product composite's health endpoint, so it also includes the health of the three core services. This means that the product composite health endpoint will only respond with UP if itself and the three core microservices are healthy. This can be used either manually or automatically by the test-em-all.bash script to find out when all the microservices and their dependencies are up and running.
+
+See the helper methods ```getHealth()```, ```getProductHealth()```, ```getRecommendationHealth()``` and ```getReviewHealth()``` of the ```ProductCompositeIntegration``` class
+
+In the main application class, **ProductCompositeServiceApplication**, we use these helper methods to register a composite health check using the Spring Actuator class ```CompositeReactiveHealthContributor```.
+
+Finally, in the application.yml configuration file of all four microservices, we configure the Spring Boot Actuator so that it does the following:
+- Shows details about the state of health, which not only includes UP or DOWN, but also information about its dependencies
+- Exposes all its endpoints over HTTP
+
+- The configuration for these two settings looks as follows:
+```
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*"
+```
+
+*WARNING: These configuration settings are helpful during development, but it can be a security issue to reveal too much information in actuator endpoints in production systems. Therefore, plan to minimize the information exposed by the actuator endpoints in production!*
+
+*This can be done by replacing "\*" with, for example, health,info in the setting of the management.endpoints.web.exposure.include property above.*
+
+The health endpoint can be used manually with the following command:
+``` curl localhost:8080/actuator/health -s | jq . ```
+
+![Health endpoint response](z_md/actuator.png)
+
+With a health API in place, we are ready to test our reactive microservices.
+
+### Using RabbitMQ without using partitions
+
+We will test the reactive microservices together with RabbitMQ but without using partitions.
+
+The default docker-compose.yml Docker Compose file is used for this configuration. The following changes have been added to the file:
+
+![img.png](z_md/rabbitmq.png)
+
+We expose the standard ports for connecting to RabbitMQ and the Admin Web UI, 5672 and 15672.
+We add a health check so that Docker can find out when RabbitMQ is ready to accept connections
+
+The microservices now have a dependency declared on the RabbitMQ service. This means that Docker will not start the microservice containers until the RabbitMQ service is reported to be healthy:
+
+![img.png](z_md/condition_service_healthy.png)
+
+**To run manual tests:**
+
+1. mvn clean install && docker-compose build && docker-compose up -d
+2. curl -s localhost:8080/actuator/health | jq -r .status
+
+When it returns UP, we are ready to run our tests
+
+3. First, create a composite product with the following commands:
+```
+body='{"productId":1,"name":"product name C","weight":300, "recommendations":[ {"recommendationId":1,"author":"author 1","rate":1,"content":"content 1"}, {"recommendationId":2,"author":"author 2","rate":2,"content":"content 2"}, {"recommendationId":3,"author":"author 3","rate":3,"content":"content 3"} ], "reviews":[ {"reviewId":1,"author":"author 1","subject":"subject 1","content":"content 1"}, {"reviewId":2,"author":"author 2","subject":"subject 2","content":"content 2"}, {"reviewId":3,"author":"author 3","subject":"subject 3","content":"content 3"} ]}'
+curl -X POST localhost:8080/product-composite -H "Content-Type: application/json" --data "$body"
+```
+When using Spring Cloud Stream together with RabbitMQ, it will create one RabbitMQ exchange per topic and a set of queues, depending on our configuration.
+
+4. Open the following URL in a web browser: http://localhost:15672/#/queues. Log in with the default username/password guest/guest. 
+You should see the following queues:
+
+![img.png](queues.png)
+
+For each topic, we can see one queue for the auditGroup, one queue for the consumer group that's used by the corresponding core microservice, and one dead-letter queue. We can also see that the auditGroup queues contain messages, as expected.
+
+5. Click on the products.auditGroup queue and scroll down to the Get messages section, expand it, and click on the button named Get Message(s) to see the message in the queue.
+   note the Payload but also the header partitionKey, which we will use in the next section where we try out RabbitMQ with partitions.
+
+6. Next, try to get the product composite using the following code:
+
+```
+curl -s localhost:8080/product-composite/1 | jq 
+```
+
+7. Finally, delete it with the following command:
+
+```
+curl -X DELETE localhost:8080/product-composite/1```
+```
+
+8. Try to get the deleted product again. It should result in a 404 - "NotFound" response
+   
+9. If you look in the RabbitMQ audit queues again, you should be able to find new messages containing delete events.
+   
+10. Wrap up the test by bringing down the microservice landscape with the following command:
+```
+docker-compose down
+```
+
+This completes the tests where we use RabbitMQ without partitions. Now, let's move on and test RabbitMQ with partitions.
+
+### Using RabbitMQ with partitions
+
+Now, let's try out the partitioning support in Spring Cloud Stream!
+
+We have a separate Docker Compose file prepared for using RabbitMQ with two partitions per topic: docker-compose-partitions.yml. It will also start two instances per core microservice, one for each partition. 
+
+Start up the microservice landscape with the following command:
+```
+export COMPOSE_FILE=docker-compose-partitions.yml
+docker-compose build && docker-compose up -d
+```
+
+Create a composite product in the same way as for the tests in the previous section but also create a composite product with the product ID set to 2. If you take a look at the queues set up by Spring Cloud Stream, you will see one queue per partition and that the product audit queues now contain one message each; the event for product ID 1 was placed in one partition and the event for product ID 2 was placed in the other partition. 
+
+To end the test with RabbitMQ using partitions, bring down the microservice landscape with the following command:
+```
+docker-compose down
+unset COMPOSE_FILE
+```
+
+## Running automated tests of the reactive microservice landscape
+
+```
+z_test_em_all.bash
+```
