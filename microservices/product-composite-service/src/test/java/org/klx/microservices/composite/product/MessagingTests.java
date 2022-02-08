@@ -34,9 +34,11 @@ import org.klx.api.core.review.Review;
 import org.klx.api.event.Event;
 
 @SpringBootTest(
-  webEnvironment = RANDOM_PORT,
-  properties = {"spring.main.allow-bean-definition-overriding=true"})
-@Import({TestChannelBinderConfiguration.class}) // To be able to inject an OutputDestination bean in the test class
+  webEnvironment = RANDOM_PORT, properties = {
+    "spring.main.allow-bean-definition-overriding=true",
+    "eureka.client.enabled=false"})
+
+@Import({TestChannelBinderConfiguration.class})
 class MessagingTests {
 
   private static final Logger LOG = LoggerFactory.getLogger(MessagingTests.class);
@@ -140,19 +142,10 @@ class MessagingTests {
     assertThat(reviewMessages.get(0), is(sameEventExceptCreatedAt(expectedReviewEvent)));
   }
 
-  /**
-   * Uses the getMessages() method to purge a topic from all current messages
-   * @param bindingName
-   */
   private void purgeMessages(String bindingName) {
     getMessages(bindingName);
   }
 
-  /**
-   *
-   * @param bindingName
-   * @return uses the getMessage() method to return all messages in a topic
-   */
   private List<String> getMessages(String bindingName) {
     List<String> messages = new ArrayList<>();
     boolean anyMoreMessages = true;
@@ -170,11 +163,6 @@ class MessagingTests {
     return messages;
   }
 
-  /**
-   *
-   * @param bindingName
-   * @return a message from a specified topic
-   */
   private Message<byte[]> getMessage(String bindingName) {
     try {
       return target.receive(0, bindingName);

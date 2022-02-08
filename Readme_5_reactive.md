@@ -203,7 +203,7 @@ The solution to this is to make it possible to specify a **key** for each messag
 
 Messages with the same key are always placed in the same partition. The messaging system only needs to guarantee the delivery order for messages in the same partition. To ensure the order of the messages, we configure one consumer instance per partition within a consumer group. By increasing the number of partitions, we can allow a consumer to increase its number of instances. This increases its message processing performance without losing the delivery order. This is illustrated in the following diagram:
 
-![Partition](partition.png)
+![Partition](z_md/partition.png)
 
 As seen in the preceding diagram, all messages with the ```Key``` set to ```123``` always go to the partition ```Products-1```, while messages with the ```Key``` set to ```456``` go to the partition ```Products-2```.
 

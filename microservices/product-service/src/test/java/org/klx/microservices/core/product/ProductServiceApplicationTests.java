@@ -20,7 +20,7 @@ import org.klx.api.event.Event;
 import org.klx.api.exceptions.InvalidInputException;
 import org.klx.microservices.core.product.persistence.ProductRepository;
 
-@SpringBootTest(webEnvironment = RANDOM_PORT)
+@SpringBootTest(webEnvironment = RANDOM_PORT, properties = {"eureka.client.enabled=false"})
 class ProductServiceApplicationTests extends MongoDbTestBase {
 
   @Autowired

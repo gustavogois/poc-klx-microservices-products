@@ -30,6 +30,7 @@
         <module>microservices/review-service</module>
         <module>api</module>
         <module>util</module>
+        <module>spring-cloud/eureka-server</module>
     </modules>
 
     <dependencyManagement>

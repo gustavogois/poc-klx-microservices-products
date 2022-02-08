@@ -22,7 +22,8 @@ import org.klx.microservices.core.review.persistence.ReviewRepository;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT, properties = {
   "spring.cloud.stream.defaultBinder=rabbit",
-  "logging.level.org.klx=DEBUG"})
+  "logging.level.org.klx=DEBUG",
+        "eureka.client.enabled=false"})
 class ReviewServiceApplicationTests extends MySqlTestBase {
 
   @Autowired

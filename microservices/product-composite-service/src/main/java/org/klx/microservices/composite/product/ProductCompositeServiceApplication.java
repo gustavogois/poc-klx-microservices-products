@@ -5,8 +5,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.klx.microservices.composite.product.services.ProductCompositeIntegration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +17,9 @@ import org.springframework.boot.actuate.health.ReactiveHealthIndicator;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
-import org.klx.microservices.composite.product.services.ProductCompositeIntegration;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @SpringBootApplication
 @ComponentScan("org.klx")
