@@ -63,21 +63,6 @@ public class ProductCompositeServiceApplication {
         .url(apiExternalDocUrl));
   }
 
-  @Autowired
-  ProductCompositeIntegration integration;
-
-  @Bean
-  ReactiveHealthContributor coreServices() {
-
-    final Map<String, ReactiveHealthIndicator> registry = new LinkedHashMap<>();
-
-    registry.put("product", () -> integration.getProductHealth());
-    registry.put("recommendation", () -> integration.getRecommendationHealth());
-    registry.put("review", () -> integration.getReviewHealth());
-
-    return CompositeReactiveHealthContributor.fromMap(registry);
-  }
-
   public static void main(String[] args) {
     SpringApplication.run(ProductCompositeServiceApplication.class, args);
   }

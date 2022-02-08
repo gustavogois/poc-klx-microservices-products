@@ -133,7 +133,7 @@ docker-compose logs review | grep Started
 
 Expect output that looks as follows:
 
-![img.png](eureka2.png)
+![img.png](z_md/eureka2.png)
 
 4. We can also use a REST API that the Eureka service exposes. To get a list of instance IDs, we can issue a curl command, like this:
 
@@ -143,7 +143,7 @@ curl -H "accept:application/json" localhost:8761/eureka/apps -s | jq -r .applica
 
 Expect a response that looks similar to the following:
 
-![img.png](eureka3.png)
+![img.png](z_md/eureka3.png)
 
 5. If you look into the test script, test-em-all.bash, you will find new tests that verify that we can reach Eureka's REST API and that it reports 4 instances:
 
@@ -161,7 +161,7 @@ curl localhost:8080/product-composite/1 -s | jq -r .serviceAddresses.rev
 
 Expect responses similar to the following:
 
-![img.png](eureka4.png)
+![img.png](z_md/eureka4.png)
 
 Note that the address of the review service changes in each response; the load balancer uses round-robin logic to call the available review instances, one at a time.
 
@@ -173,7 +173,7 @@ docker-compose logs review | grep getReviews
 
 You will see output that looks similar to the following:
 
-![img.png](eureka5.png)
+![img.png](z_md/eureka5.png)
 
 In the preceding output, we can see how the three review microservice instances, review_1, review_2, and review_3, in turn, have responded to the requests.
 
@@ -197,11 +197,11 @@ curl localhost:8080/product-composite/1 -m 2
 
 If a timeout occurs, that is, the client-side load balancer tries to call an instance that no longer exists, the following response is expected from curl:
 
-![img.png](eureka6.png)
+![img.png](z_md/eureka6.png)
 
 3. Besides that, we should expect normal responses from the two remaining instances; that is, the serviceAddresses.rev field should contain the addresses of the two instances, as in the following:
 
-![img.png](eureka7.png)
+![img.png](z_md/eureka7.png)
 
 In the preceding sample output, we can see that two different container names and IP addresses are reported. This means that the requests have been served by the two remaining microservice instances.
 
