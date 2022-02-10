@@ -2,44 +2,48 @@
 
 ## Introduction
 
-Ce travail vise à démontrer les gains et la nécessité de faire évoluer l'architecture des 
-microservices de CiT. 
-<BR><BR>
-L'architecture actuelle a été bien construite et répond assez aux besoins actuels de l'entreprise. 
-Cependant, naturellement, les logiciels se dégradent avec le temps. Ajoute des éléments à la dette technique, 
-de nouvelles dépendances sont ajoutées, des technologies deviennent obsolètes, etc. 
+Cette proposition de faire évoluer l'architecture de nos micro services est née d'une première 
+tentative de faire évoluer la version Spring Boot et les dépendances associées.
+Cependant, nous nous sommes rendu compte que l'effort à fournir n'en vaudrait pas la peine, 
+compte tenu de l'architecture actuelle de nos micro services.
 
-En outre, la technologie des microservices a beaucoup avancé ces dernières années, avec l'émergence et consolidation de 
-nouvelles technologies (containers, kubernetes, <i>design patterns</i>, etc.), notamment à travers le framework 
-Spring/Spring Cloud. 
+En outre, la technologie des microservices a beaucoup avancé ces dernières années, avec l'émergence et consolidation de
+nouvelles technologies (containers, kubernetes, <i>design patterns</i>, etc.), notamment à travers le framework
+Spring/Spring Cloud.
 
-Dans le domaine des tests d'intégration de microservices, par exemple, nous pouvons utiliser des 
-tests conteneurisés. Lorsque ces tests démarrent des conteneurs avec les contextes de microservices, 
-exécutent les tests, puis détruisent les conteneurs. 
+Dans le domaine des tests d'intégration de microservices, par exemple, nous pouvons utiliser des
+tests conteneurisés. Lorsque ces tests démarrent des conteneurs avec les contextes de microservices,
+exécutent les tests, puis détruisent les conteneurs.
+
+**C'est pourquoi nous proposons une évolution de l'architecture actuelle de nos microservices, 
+en utilisant non seulement les versions récentes de Spring Boot et des technologies adjacentes, 
+mais également certains des *design patterns* les plus connus qui ajouteront de la valeur à 
+nos microservices, en plus de faciliter le développement et la maintenance de ceux-ci.**
+
+Nous soulignons, désormais, que nous continuerons à respecter les priorités définies par le PO. 
+Nous pourrions, si le PO le souhaite, que nous travaillions sur cette évolution avec la priorité 
+la plus basse, compte tenu de l'arriéré dans lequel nous nous trouvons à un moment donné. 
+Autrement dit, uniquement lorsque nous avons du temps libre.
 
 Plus loin dans ce document, nous détaillons certains des bénéfices attendus avec l'évolution de
 cette architecture.
 
-Cependant, pour bien utiliser le framework Spring/Spring Cloud et plusieurs autres solutions 
-adjacentes, nous devons mettre à jour des bibliothèques assez obsolètes. On utilise Spring Boot 1.4, lancé en 2016,
-étant que nous sommes dans la version 2.6. Et comme déjà vérifié dans un de nos travaux récents sur le CiT, l'effort d'un 
-refactoring pour l'évolution de l'architecture est plus petit et plus efficace qu'un éventuel effort de mise à jour 
-des bibliothèques.
-
 ## Méthodologie proposée
 
-Nous proposons de travailler sur l'évolution de l'architecture chaque fois que nous n'avons pas d'autres activités plus 
-prioritaires à développer.
-
-Profitant de la nature des microservices, nous pouvons travailler de manière évolutive et isolée, c'est-à-dire que 
+Profitant de la nature des microservices, nous pouvons travailler de manière évolutive et isolée, 
+c'est-à-dire que 
 chacun des microservices évolue séparément.
 
-De cette façon, nous définirions d'abord une architecture standard, modèle, idéale pour nos microservices.
-L'idée est d'implémenter une POC pour cela, en écrivant un petit nouveau projet qui sert de base et de modèle à 
+De cette façon, nous définirions d'abord une architecture standard, modèle, idéale pour nos 
+microservices.
+L'idée est d'implémenter une POC pour cela, en écrivant un petit nouveau projet qui sert de base et 
+de modèle à 
 l'architecture de nos microservices.
 
-Ensuite, nous choisirons l'un des microservices (ou deux, étant donné que l'équipe middleware est composée de deux 
-développeurs) et appliquerons la nouvelle architecture à ce microservice. Veuillez noter que jusqu'à ce que le nouveau 
+Ensuite, nous choisirons l'un des microservices (ou deux, étant donné que l'équipe middleware est 
+composée de deux 
+développeurs) et appliquerons la nouvelle architecture à ce microservice. Veuillez noter que 
+jusqu'à ce que le nouveau 
 microservice soit entièrement développé et testé, le microservice actuel sera opérationnel normalement.
 
 Récapitulant :
@@ -328,7 +332,7 @@ implémenter ces *Design Patterns*.
 </table>
 
 Certains autres DPs sont déjà mis en œuvre par CiT, tels que :
-- <i>Centralized log analysis</>, avec Kibana.
+- <i>Centralized log analysis</i>, avec Kibana.
 - <i>Control loop</i> (<i>Observe, Analyse, Act</i>), avec kubernetes.
 - <i>Centralized monitoring and alarms</i>, avec Grafana
 
@@ -348,6 +352,8 @@ Et pour la conteneurisation, nous continuerons avec les solutions Docker et Kube
 ## Références
 
 1. Building Microservices - Second edition. Sam Newman. O'Reilly Media, Inc., 2021.
-2. Microservices with Spring Boot and Spring Cloud - Second Edition. Magnus Larsson. Packt Publishing, 2021.
-3. The Reactive manifesto. https://www.reactivemanifesto.org/ 
-4. Good design principles for microservices, the 12-factor app. https://12factor.net 
+2. Spring Microservices in Action, Second Edition. John Carnell, Illary Huaylupo Sánchez. 2021
+3. Learn Microservices with Spring Boot: A Practical Approach to RESTful Services Using an Event-Driven Architecture, 
+Cloud-Native Patterns, and Containerization. Moisés Macero García. 2021.
+4. Microservices with Spring Boot and Spring Cloud - Second Edition. Magnus Larsson. Packt Publishing, 2021.
+6. Good design principles for microservices, the 12-factor app. https://12factor.net 
