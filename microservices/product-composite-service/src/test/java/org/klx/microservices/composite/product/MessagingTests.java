@@ -34,7 +34,9 @@ import org.klx.api.core.review.Review;
 import org.klx.api.event.Event;
 
 @SpringBootTest(
-  webEnvironment = RANDOM_PORT, properties = {
+  webEnvironment = RANDOM_PORT,
+        classes = {TestSecurityConfig.class},
+        properties = {
     "spring.main.allow-bean-definition-overriding=true",
     "eureka.client.enabled=false"})
 
